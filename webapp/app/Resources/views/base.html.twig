@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+<head>
+  <title>{% block title %}Đội tuyển tin{% endblock %}</title>
+  <meta charset="{{DJ_CHARACTER_SET}}" />
+  <link rel="icon" href="{{asset('images/favicon.png') }}" type="image/png" />
+  <link rel="stylesheet" href="{{asset('style.css')}}" type="text/css" />
+  <link rel="stylesheet" href="{{asset('css/octicons/octicons.css')}}" />
+  <script type="text/javascript" src="{{asset('js/jquery.min.js')}}"></script>
+
+  <link rel="stylesheet" href="{{asset('style_jury.css')}}" type="text/css" />
+  <link rel="stylesheet" href="{{asset('style_printer.css')}}" type="text/css" media="print" />
+  <script type="text/javascript" src="{{asset('js/jury.js')}}"></script>
+  <script type="text/javascript" src="{{asset('js/js.cookie.min.js')}}"></script>
+  <script type="text/javascript" src="{{asset('js/jscolor.js')}}"></script>
+  <link rel="stylesheet" href="{{asset('token-input.css')}}" type="text/css" />
+  <script type="text/javascript" src="{{asset('js/jquery.tokeninput.min.js')}}"></script>
+  <script type="text/javascript" src="{{asset('js/sorttable.js')}}"></script>
+  <script type="text/javascript" src="{{asset('js/domjudge.js')}}"></script>
+
+  {% block extrahead %}{% endblock %}
+</head>
+<body>
+  {% block body %}{% endblock %}
+  <!-- DOMjudge version {{DOMJUDGE_VERSION}} -->
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% extends "::base.html.twig" %}
+
+{% block title %}Đăng ký{% endblock %}
+
+{% block extrahead %}
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="./css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="style_login.css" type="text/css" />
+{% endblock %}
+
+{% block body %}
+
+  <form class="form-signin" name ="user_registration" method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+      <h1 class="h3 mb-3 font-weight-normal">Đăng ký</h1>
+    {{ form_widget(registration_form._token) }}
+   
+        <input type="text" id="username" name="user_registration[username]" class="form-control" placeholder="Tên tài khoản" required autofocus>    
+	<input type="password" id="inputpassword" name="user_registration[plainPassword][first]" class="form-control" placeholder="Mật khẩu" required>   
+        <input type="password" id="inputPassword" name="user_registration[plainPassword][second]" class="form-control" placeholder="Nhập lại mật khẩu" required>   
+        <button type="submit" class="btn btn-lg btn-primary btn-block">Sign up</button>
+        <div class='alert  alert-danger '>{{form_errors(registration_form.username)}}{{form_errors(registration_form.plainPassword)}}{{form_errors(registration_form)}}</div>  
+  </form>
+
+  {% include '::footer.html.twig' %}
+{% endblock %}

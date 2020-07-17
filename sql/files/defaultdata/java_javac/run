@@ -1,0 +1,73 @@
+#!/bin/sh
+
+# Java compile wrapper-script for 'compile.sh'.
+# See that script for syntax and more info.
+#
+# This script byte-compiles with the javac compiler and generates
+# a shell script to run it with the java interpreter later.
+#
+# NOTICE: this compiler script cannot be used with the USE_CHROOT
+# configuration option turned on, unless proper preconfiguration of
+# the chroot environment has been taken care of!
+
+DEST="$1" ; shift
+MEMLIMIT="$1" ; shift
+MAINSOURCE="$1"
+
+# Stack size in the JVM in KB. Note that this will be deducted from
+# the total memory made available for the heap.
+MEMSTACK=65536
+
+# Amount of memory reserved for the Java virtual machine in KB. The
+# default below is just above the maximum memory usage of current
+# versions of the jvm, but might need increasing in some cases.
+MEMJVM=65536
+
+MEMRESERVED=$((MEMSTACK + MEMJVM))
+
+# Java needs filename to match main class:
+if [ -z "$ENTRY_POINT" ]; then
+	echo "Info: no ENTRY_POINT provided, assuming 'Main'."
+	MAINCLASS="Main"
+else
+	MAINCLASS="$ENTRY_POINT"
+fi
+
+# Byte-compile:
+javac -encoding UTF-8 -sourcepath . -d . "$@"
+EXITCODE=$?
+[ "$EXITCODE" -ne 0 ] && exit $EXITCODE
+
+# Check if entry point is valid
+javap "$MAINCLASS" > /dev/null
+EXITCODE=$?
+[ "$EXITCODE" -ne 0 ] && exit $EXITCODE
+
+# Calculate Java program memlimit as MEMLIMIT - max. JVM memory usage:
+MEMLIMITJAVA=$((MEMLIMIT - MEMRESERVED))
+
+# Write executing script:
+# Executes java byte-code interpreter with following options
+# -Xmx: maximum size of memory allocation pool
+# -Xms: initial size of memory, improves runtime stability
+# -XX:+UseSerialGC: Serialized garbage collector improves runtime stability
+# -Xss${MEMSTACK}k: stack size as configured abve
+# -Dfile.encoding=UTF-8: set file encoding to UTF-8
+cat > "$DEST" <<EOF
+#!/bin/sh
+# Generated shell-script to execute java interpreter on source.
+
+# Detect dirname and change dir to prevent class not found errors.
+if [ "\${0%/*}" != "\$0" ]; then
+	cd "\${0%/*}"
+fi
+
+# Add -DONLINE_JUDGE or -DDOMJUDGE below if you want it make easier for teams
+# to do local debugging.
+
+exec java -Dfile.encoding=UTF-8 -XX:+UseSerialGC -Xss${MEMSTACK}k -Xms${MEMLIMITJAVA}k -Xmx${MEMLIMITJAVA}k '$MAINCLASS' "\$@"
+EOF
+
+chmod a+x "$DEST"
+
+exit 0

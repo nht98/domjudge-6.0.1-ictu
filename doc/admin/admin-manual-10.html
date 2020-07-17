@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<LINK REL="stylesheet" HREF="../../../style.css">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.73">
+ <TITLE>DOMjudge Administrator's Manual: Developer information </TITLE>
+ <LINK HREF="admin-manual-9.html" REL=previous>
+ <LINK HREF="admin-manual.html#toc10" REL=contents>
+</HEAD>
+<BODY>
+Next
+<A HREF="admin-manual-9.html">Previous</A>
+<A HREF="admin-manual.html#toc10">Contents</A>
+<HR>
+<H2><A NAME="appendix:developerinfo"></A> <A NAME="s10">10.</A> <A HREF="admin-manual.html#toc10">Developer information </A></H2>
+
+
+<P>This section contains instructions specifically for those wishing
+to modify the DOMjudge source. If you have any questions about
+developing DOMjudge, or if you want to share your changes that
+may be useful to others, please don't hesitate to contact us
+through 
+<A HREF="https://www.domjudge.org/mailman/listinfo/domjudge-devel">our development mailing list</A>.</P>
+
+
+<H2><A NAME="ss10.1">10.1</A> <A HREF="admin-manual.html#toc10.1">Bootstrapping from Git repository sources</A>
+</H2>
+
+
+<P>The installation steps in this document assume that you are using a
+downloaded tarball from the DOMjudge website. If you want to install
+from Git repository sources, because you want to use the bleeding edge
+code or consider to send a patch to the developers, the
+configure/build system first has to be bootstrapped.</P>
+<P>This requires
+additional software to be installed:
+<UL>
+<LI> The GNU autoconf/automake toolset
+</LI>
+<LI> Composer - PHP Package Manager.
+</LI>
+<LI> Linuxdoc and groff to build the admin and judge
+documentation from SGML sources and a LaTeX installation to
+generate the PDF admin, judge and default team manual.</LI>
+</UL>
+</P>
+<P>On Debian(-based) systems, the following apt command should
+install the additionally required packages (next to the
+<A HREF="admin-manual-3.html#install_config:package-install">standard set of packages</A>):
+<HR>
+<PRE>
+sudo apt install autoconf automake git composer
+</PRE>
+<HR>
+</P>
+<P>Composer is packaged since Debian Stretch and Ubuntu Xenial.
+Alternatively, it can be installed by following the documentation
+located 
+<A HREF="https://getcomposer.org/download">here</A>.</P>
+<P>When this software is present, bootstrapping can be done by running
+<CODE>make dist</CODE>, which creates the <CODE>configure</CODE> script,
+downloads and installs the PHP dependencies via composer and
+generates documentation from SGML/LaTeX sources.</P>
+
+<H2><A NAME="ss10.2">10.2</A> <A HREF="admin-manual.html#toc10.2">Maintainer mode installation</A>
+</H2>
+
+
+<P>Besides the two modes of installation described in section
+<A HREF="admin-manual-3.html#install_config:installsystem">Installation system</A>,
+DOMjudge provides a special maintainer mode installation.
+This method does an in-place installation within the source
+tree. This allows one to immediately see effects when modifying
+code.</P>
+<P>This method requires some special steps which can most easily
+be run via makefile rules as follows:
+<HR>
+<PRE>
+sudo apt install acl
+make maintainer-conf [CONFIGURE_FLAGS=&lt;extra options for ./configure&gt;]
+make maintainer-install
+</PRE>
+<HR>
+
+Note that these targets have to be executed <EM>separately</EM> and
+they replace the steps described in the section
+<A HREF="admin-manual-3.html#install_config:installsystem">Installation system</A>;
+also no <CODE>--prefix</CODE> flag or other directories have to be
+specified to <CODE>configure</CODE>. In this case the binaries
+(e.g. <CODE>judgedaemon</CODE> and <CODE>dj_setup_database</CODE>) can be
+found in their respective source directories, and are also symlinked
+in <CODE>bin</CODE>.</P>
+
+<H2><A NAME="ss10.3">10.3</A> <A HREF="admin-manual.html#toc10.3">Makefile structure</A>
+</H2>
+
+
+<P>The Makefiles in the source tree use a recursion mechanism to run make
+targets within the relevant subdirectories. The recursion is handled
+by the <CODE>REC_TARGETS</CODE> and <CODE>SUBDIRS</CODE> variables and the
+recursion step is executed in <CODE>Makefile.global</CODE>. Any target
+added to the <CODE>REC_TARGETS</CODE> list will be recursively called in
+all directories in <CODE>SUBDIRS</CODE>. Moreover, a local variant of the
+target with <CODE>-l</CODE> appended is called after recursing into the
+subdirectories, so recursion is depth-first.</P>
+<P>The targets <CODE>dist, clean, distclean, maintainer-clean</CODE> are
+recursive by default, which means that these call their local
+<CODE>-l</CODE> variants in all directories containing a Makefile. This
+allows for true depth-first traversal, which is necessary to correctly
+run the <CODE>*clean</CODE> targets: otherwise e.g. <CODE>paths.mk</CODE> will
+be deleted before subdirectory <CODE>*clean</CODE> targets are called that
+depend on information in it.</P>
+
+
+<HR>
+Next
+<A HREF="admin-manual-9.html">Previous</A>
+<A HREF="admin-manual.html#toc10">Contents</A>
+</BODY>
+</HTML>

@@ -1,0 +1,492 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<LINK REL="stylesheet" HREF="../../../style.css">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.73">
+ <TITLE>DOMjudge Administrator's Manual: Setting up a contest </TITLE>
+ <LINK HREF="admin-manual-5.html" REL=next>
+ <LINK HREF="admin-manual-3.html" REL=previous>
+ <LINK HREF="admin-manual.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="admin-manual-5.html">Next</A>
+<A HREF="admin-manual-3.html">Previous</A>
+<A HREF="admin-manual.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="contestsetup"></A> <A NAME="s4">4.</A> <A HREF="admin-manual.html#toc4">Setting up a contest </A></H2>
+
+
+<P>After installation is successful, you want to run your contest!
+Configuring DOMjudge to run a contest (or a number of them, in
+sequence) involves the following steps:</P>
+<P>
+<UL>
+<LI> Configure the contest data;</LI>
+<LI> Set up authentication for teams;</LI>
+<LI> Supply in- and output testdata;</LI>
+<LI> Check that everything works.</LI>
+</UL>
+</P>
+
+<H2><A NAME="contestsetup:database"></A> <A NAME="ss4.1">4.1</A> <A HREF="admin-manual.html#toc4.1">Configure the contest data </A>
+</H2>
+
+
+<P>DOMjudge stores and retrieves most of its data from the MySQL
+database. Some information must be filled in beforehand, other tables
+will be populated by DOMjudge.</P>
+<P>You can use the jury web interface to add, edit and delete most types
+of data described below. It's advised to keep a version of phpMyAdmin
+handy in case of emergencies, or for general database operations like
+import and export.</P>
+<P>This section describes the meaning of each table and what you need to
+put into it. Tables marked with an `x' are the ones you have to
+configure with contest data before running a contest (via the jury web
+interface or e.g. with phpMyAdmin), the other tables are used
+automatically by the software:
+<TABLE BORDER><TR><TD>
+</TD><TD>auditlog </TD><TD>Log of every state-changing event.</TD></TR><TR><TD>
+</TD><TD>balloon </TD><TD>Balloons to be handed out.</TD></TR><TR><TD>
+</TD><TD>clarification </TD><TD>Clarification requests/replies are stored here.</TD></TR><TR><TD>
+x</TD><TD>configuration </TD><TD>Runtime configuration settings.</TD></TR><TR><TD>
+x</TD><TD>contest </TD><TD>Contest definitions with start/end time.</TD></TR><TR><TD>
+x</TD><TD>contestproblem </TD><TD>Coupling of problems to contests and data specific to it.</TD></TR><TR><TD>
+x</TD><TD>contestteam </TD><TD>Coupling of teams to contests.</TD></TR><TR><TD>
+</TD><TD>event </TD><TD>Log of events during contests.</TD></TR><TR><TD>
+x</TD><TD>executable </TD><TD>Executable compile/run/compare scripts.</TD></TR><TR><TD>
+</TD><TD>internal_error</TD><TD>Stores errors that occurred on judgehosts including logs.</TD></TR><TR><TD>
+</TD><TD>judgehost </TD><TD>Computers (hostnames) that function as judgehosts.</TD></TR><TR><TD>
+x</TD><TD>judgehost_restriction</TD><TD>Optional restriction sets on submissions taken by judgehosts.</TD></TR><TR><TD>
+</TD><TD>judging </TD><TD>Judgings of submissions.</TD></TR><TR><TD>
+</TD><TD>judging_run </TD><TD>Result of one testcase within a judging.</TD></TR><TR><TD>
+x</TD><TD>language </TD><TD>Definition of allowed submission languages.</TD></TR><TR><TD>
+x</TD><TD>problem </TD><TD>Definition of problems (name, timelimit, etc.).</TD></TR><TR><TD>
+</TD><TD>rankcache </TD><TD>Cache of team ranking data for public/teams and for the jury.</TD></TR><TR><TD>
+</TD><TD>rejudging </TD><TD>Metadata for batched rejudging.</TD></TR><TR><TD>
+</TD><TD>role </TD><TD>Possible user roles.</TD></TR><TR><TD>
+</TD><TD>scorecache </TD><TD>Cache of the scoreboards for public/teams and for the jury.</TD></TR><TR><TD>
+</TD><TD>submission </TD><TD>Submission metadata of solutions to problems.</TD></TR><TR><TD>
+</TD><TD>submission_file </TD><TD>Submitted code files.</TD></TR><TR><TD>
+x</TD><TD>team </TD><TD>Definition of teams.</TD></TR><TR><TD>
+x</TD><TD>team_affiliation </TD><TD>Definition of institutions a team can be affiliated with.</TD></TR><TR><TD>
+x</TD><TD>team_category </TD><TD>Different category groups teams can be put in.</TD></TR><TR><TD>
+</TD><TD>team_unread </TD><TD>Records which clarifications are read by which team.</TD></TR><TR><TD>
+x</TD><TD>testcase </TD><TD>Definition of testdata for each problem.</TD></TR><TR><TD>
+x</TD><TD>user </TD><TD>Users that will able to access the system.</TD></TR><TR><TD>
+x</TD><TD>userrole </TD><TD>Mapping of users to their roles.
+</TD></TR></TABLE>
+</P>
+<P>Now follows a longer description (including fields) per table that has
+to be filled manually. As a general remark: almost all tables have an
+identifier field. Most of these are numeric and automatically
+increasing; these do not need to be specified. The tables
+<CODE>executable</CODE> and <CODE>language</CODE> have text strings as identifier
+fields. These need to be manually specified and only alpha-numeric, dash and
+underscore characters are valid, i.e. <CODE>a-z, A-Z, 0-9, -, _</CODE>.</P>
+<P>
+<DL>
+<DT><B>configuration</B><DD>
+<P>This table contains configuration settings.
+These entries are simply stored as <CODE>name, value</CODE> pairs, where
+the values are JSON encoded, <CODE>type</CODE> contains the allowed data
+type, and <CODE>description</CODE> documents the configuration setting.</P>
+
+<DT><B>contest</B><DD>
+<P>The contests that the software will run. E.g. a test session and the
+live contest.</P>
+<P><CODE>cid</CODE> is the reference ID and <CODE>contestname</CODE> is a
+descriptive name used in the interface, while <CODE>shortname</CODE> is
+the publicly visible identifier.</P>
+<P><CODE>activatetime</CODE>, <CODE>starttime</CODE> and <CODE>endtime</CODE>
+are required fields and specify when this contest is active and
+open for submissions. Optional <CODE>freezetime</CODE> and
+<CODE>unfreezetime</CODE> control scoreboard freezing and
+<CODE>deactivatetime</CODE> when the contest is not visible anymore.
+For a detailed treating of these, see section 
+<A HREF="#contestsetup:milestones">Contest milestones</A>.
+All contest times can be specified relative to <CODE>starttime</CODE>,
+except of course <CODE>starttime</CODE> itself. The input given in the
+jury interface (either relative or absolute) is stored in the
+<CODE>*time_string</CODE> fields, while a calculated absolute version is
+stored in the fields without the <CODE>_string</CODE> suffix.</P>
+<P>The <CODE>public</CODE> field can be used to limit which contests are
+displayed as public scoreboards (as opposed to privately to a selected
+set of teams), while <CODE>enabled</CODE> can be used to (temporarily)
+disable a contest altogether.</P>
+
+<DT><B>contestproblem</B><DD>
+<P>This table couples problems to contests: <CODE>cid</CODE> and
+<CODE>probid</CODE> describe the pairing.</P>
+<P>Furthermore, it stores problem data that is specific for the included
+contest: <CODE>shortname</CODE> is a contest-unique identifier string for
+the problem, <CODE>points</CODE> defaults to 1 and can be set to assign
+non-even scoring; <CODE>allow_submit</CODE> determines whether teams can submit
+solutions for this problem. Non-submittable problems are also not
+displayed on the scoreboard. This can be used to define spare
+problems, which can then be added to the contest quickly;
+<CODE>allow_judge</CODE> determines whether judgehosts will judge
+submissions for this problem. See also the explanation for language.</P>
+<P>The <CODE>color</CODE> tag can be filled with a CSS colour specification
+to associate with this problem; see also section 
+<A HREF="admin-manual-6.html#scoreboard:colours">Scoreboard: colours</A>.</P>
+
+<DT><B>contestteam</B><DD>
+<P>This table couples teams to contests. Teams can only submit solutions to
+problems in contests that are public or which they are part of.</P>
+
+<DT><B>executable</B><DD>
+<P>This table stores zip-bundles of executable scripts that can be used
+as compile, run, and compare scripts.</P>
+
+<DT><B>judgehost_restriction</B><DD>
+<P>This table encodes restriction sets for selecting which submissions
+are sent to a judgehost. The restrictions are JSON encoded in
+the <CODE>restrictions</CODE> column, and can be set in the admin web
+interface to restrict on specific contests, problems, languages, and
+to never rejudge on the same judgehost. A restriction set can be
+assigned to judgehost(s) on the edit page of the judgehosts overview.</P>
+
+<DT><B>language</B><DD>
+<P>Programming languages in which to accept and judge submissions.
+<CODE>langid</CODE> is a string of maximum length 8, which references the
+language.
+<CODE>name</CODE> is the displayed name of the language;
+<CODE>extensions</CODE> is a JSON encoded list of recognized filename extensions;
+<CODE>allow_submit</CODE> determines whether teams can submit
+using this language; <CODE>allow_judge</CODE> determines whether
+judgehosts will judge submissions for this problem. This can for
+example be set to <EM>no</EM> to temporarily hold judging when a problem occurs
+with the judging of a specific language; after resolution of the
+problem this can be set to <EM>yes</EM> again.</P>
+<P><CODE>time_factor</CODE> is the relative factor by which the timelimit is
+multiplied for solutions in this language; <CODE>compile_script</CODE>
+refers to a compile executable script that is used for this language.</P>
+
+<DT><B>problem</B><DD>
+<P>This table contains the problem definitions. <CODE>probid</CODE> is the
+reference ID, <CODE>cid</CODE> is the contest ID this problem is (only)
+defined for: a problem cannot be used in multiple contests.
+<CODE>name</CODE> is the full name (description) of the problem.</P>
+<P><CODE>allow_submit</CODE> determines whether teams can submit
+solutions for this problem. Non-submittable problems are also not
+displayed on the scoreboard. This can be used to define spare
+problems, which can then be added to the contest quickly;
+<CODE>allow_judge</CODE> determines whether judgehosts will judge
+submissions for this problem. See also the explanation for language.</P>
+<P><CODE>timelimit</CODE> is the timelimit in seconds
+within which solutions for this problem have to run (taking into
+account <CODE>time_factor</CODE> per language). See also
+<A HREF="admin-manual-8.html#problems:timelimits">enforcement of time limits</A> for
+more details.</P>
+<P><CODE>memlimit</CODE> is the memory limit in kB allotted for this problem.
+If empty then the global configuration setting <CODE>memory_limit</CODE>
+is used. Equivalently for <CODE>outputlimit</CODE>.</P>
+<P><CODE>special_run</CODE> if not empty defines a custom run program
+<CODE>run_&lt;special_run&gt;</CODE> to run compiled submissions for
+this problem and <CODE>special_compare</CODE> if not empty defines a
+custom compare program <CODE>compare_&lt;special_compare&gt;</CODE> to
+compare output for this problem.</P>
+<P>The <CODE>color</CODE> tag can be filled with a CSS colour specification
+to associate with this problem; see also section 
+<A HREF="admin-manual-6.html#scoreboard:colours">Scoreboard: colours</A>.</P>
+<P>In <CODE>problemtext</CODE> a PDF, HTML or plain text document can be
+placed which allows team, public and jury to download the problem
+statement. Note that no additional filtering takes place, so HTML
+(and PDF to some extent) should be from a trusted source to prevent
+cross site scripting or other attacks. The file type is stored in
+<CODE>problemtext_type</CODE>.</P>
+
+<DT><B>team</B><DD>
+<P>Table of teams: <CODE>teamid</CODE> is (internal) ID of the team,
+while <CODE>externalid</CODE> can be used to store an ID for im/exporting
+to other systems.
+<CODE>name</CODE> the displayed name of the team, <CODE>categoryid</CODE> is
+the ID of the category the team is in; <CODE>affilid</CODE> is the
+affiliation ID of the team.</P>
+<P>When <CODE>enabled</CODE> is set to 0, the team immediately disappears from
+the scoreboards and cannot use the team web interface anymore, even
+when already logged in. One use case could be to disqualify a team on
+the spot.</P>
+<P><CODE>members</CODE> are the names of the team members, separated by
+newlines and <CODE>room</CODE> is the location or room of the team, both for
+display only; <CODE>comments</CODE> can be filled with arbitrary useful
+information and is only visible to the jury.
+The timestamp <CODE>teampage_first_visited</CODE> and the <CODE>hostname</CODE>
+field indicate when/whether/from where a team visited its team web interface.</P>
+<P>The <CODE>penalty</CODE> field can be used to give this team a (positive
+or negative) number of penalty minutes to correct for exceptional
+circumstances.</P>
+
+<DT><B>team_affiliation</B><DD>
+<P><CODE>affilid</CODE> is the reference ID and <CODE>name</CODE> the name of the
+institution. <CODE>country</CODE> should be the 3 character
+<A HREF="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-3#Officially_assigned_code_elements">ISO 3166-1 alpha-3 abbreviation</A>
+of the country and <CODE>comments</CODE> is a free form field
+that is displayed in the jury interface.</P>
+<P>A country flag can be displayed on the scoreboard. For this to work,
+the <CODE>country</CODE> field must match a (flag) picture in
+<CODE>webapp/web/images/countries/&lt;country&gt;.png</CODE>. All
+country flags are present there, named with their 3-character ISO
+codes. See also <CODE>webapp/web/images/countries/README</CODE>.</P>
+
+<DT><B>team_category</B><DD>
+<P><CODE>categoryid</CODE> is the reference ID and <CODE>name</CODE> is a string:
+the name of the category. <CODE>sortorder</CODE> is the order at which
+this group must be sorted in the scoreboard, where a higher number
+sorts lower and equal sort depending on score.</P>
+<P>The <CODE>color</CODE> is again a CSS colour specification used to
+discern different categories easily. See also section 
+<A HREF="admin-manual-6.html#scoreboard:colours">Scoreboard: colours</A>.</P>
+<P>The <CODE>visible</CODE> flag determines whether teams in this category
+are displayed on the public/team scoreboard. This feature can be used
+to remove teams from the public scoreboard by assigning them to a
+separate, invisible category.</P>
+
+<DT><B>testcase</B><DD>
+<P>The testcase table contains testdata for each problem;
+<CODE>testcaseid</CODE> is a unique identifier, <CODE>input</CODE> and
+<CODE>output</CODE> contain the testcase input/output and <CODE>image</CODE>
+an optional graphical representation of the testcase for the jury.
+The fields <CODE>md5sum_input</CODE>, <CODE>md5sum_output</CODE>,
+and <CODE>md5sum_image</CODE> contain their respective md5
+hashes to check for up-to-date-ness of cached versions by the
+judgehosts and <CODE>image_thumb</CODE> and <CODE>image_type</CODE> a
+thumbnail version and mimetype string for the image.
+The field <CODE>probid</CODE> is the corresponding problem and
+<CODE>rank</CODE> determines the order of the testcases for one problem.
+<CODE>description</CODE> is an optional description for this testcase. See
+also 
+<A HREF="#contestsetup:testdata">providing testdata</A>.</P>
+
+<DT><B>user</B><DD>
+<P>This table has the users that the system knows about with their
+login credentials. Each user may have one or more roles, like
+being part of a team, being a jury member or administrator.
+There are also functional accounts, like for judgedaemons.</P>
+
+</DL>
+</P>
+
+<H2><A NAME="contestsetup:milestones"></A> <A NAME="ss4.2">4.2</A> <A HREF="admin-manual.html#toc4.2">Contest milestones</A>
+</H2>
+
+
+<P>The <CODE>contest</CODE> table specifies timestamps for each contest
+that mark specific milestones in the course of the contest.</P>
+<P>The triplet <EM>activatetime</EM>, <EM>starttime</EM> and <EM>endtime</EM>
+define when the contest runs and are required fields (activatetime and
+starttime may be equal).</P>
+<P>activatetime is the moment when a contest first becomes
+visible to the public and teams . Nothing can be submitted yet and the
+problem set is not revealed. Clarifications can be viewed and sent.</P>
+<P>At starttime, the scoreboard is displayed and submissions are accepted.
+At endtime the contest stops. New incoming submissions will still be
+processed and judged, but the result will not be shown anymore to teams;
+they instead receive the verdict`too-late'. Unjudged submissions received
+before endtime will still be judged normally.</P>
+<P><EM>freezetime</EM> and <EM>unfreezetime</EM> control scoreboard
+freezing. freezetime is the time after which the public and team
+scoreboard are not updated anymore (frozen). This is meant to make the
+last stages of the contest more thrilling, because no-one knows who has
+won. Leaving them empty disables this feature. When using this feature,
+unfreezetime can be set to automatically `unfreeze' the scoreboard at
+that time. For a more elaborate description, see also section 
+<A HREF="admin-manual-6.html#scoreboard:freeze">Scoreboard: freezing and defrosting</A>.</P>
+<P>The scoreboard, results and clarifications will remain to be displayed
+to team and public after a contest, until the <EM>deactivatetime</EM>.</P>
+<P>All events happen at the first moment of the defined time. That is:
+for a contest with starttime "12:00:00" and endtime "17:00:00", the
+first submission will be accepted at 12:00:00 and the last one at
+16:59:59.</P>
+<P>The following ordering must always hold: activatetime &lt;= starttime
+&lt; (freezetime &lt;=) endtime (&lt;= unfreezetime) (&lt;= deactivatime).</P>
+
+
+<H2><A NAME="contestsetup:authentication"></A> <A NAME="ss4.3">4.3</A> <A HREF="admin-manual.html#toc4.3">User authentication </A>
+</H2>
+
+
+<P>The authentication system lets the domserver know which user it is dealing
+with and which role(s) the user has. This system is modular, allowing
+flexible addition of new methods, if required. The following methods
+are available by default for authentication.</P>
+
+<H3>PHP session with passwords (default)</H3>
+
+
+<P>Each user receives a password and PHP's session management is used to
+keep track of which user is logged in. This method is easiest to
+setup. It does require the administrator to generate users and passwords
+for all teams (this can be done in the jury interface) and distribute those,
+though. Also, each team has to login each time they (re)start their
+browser. The password is stored in a salted MD5 hash in the
+<CODE>password</CODE> field in database (user table).</P>
+
+<H3>IP-address based</H3>
+
+
+<P>The IP-address of a team's workstation is used as the primary means of
+authentication. The system assumes that someone coming from a specific
+IP is the user with that IP listed in the user table. When a team
+browses to the web interface, this is checked and the appropriate team
+page is presented.</P>
+<P>This method has the advantage that teams do not have to login. A
+requirement for this method is that each team computer has a separate
+IP-address from the view of the domserver, though, so this is most
+suitable for onsite contests and might not work with online contests
+if multiple teams are located behind a router, for example.</P>
+<P>There are two possible ways of configuring team IP-addresses.</P>
+
+<H3>Supply it beforehand</H3>
+
+
+<P>Before the contest starts, when entering teams into the database, add
+the IP that each team will have to that user's entry in the
+<CODE>ip_address</CODE> field. When the teams
+arrive, everything will work directly and without further
+configuration (except when teams switch workplaces). If possible, this
+is the recommended modus operandi, because it's the least hassle just
+before and during the contest.</P>
+
+<H3>Use one-time passwords</H3>
+
+
+<P>Supply the teams with a one time username and password with which to
+authenticate. Beforehand, generate passwords for each team in the jury
+interface. When the test session (or contest) starts and a team
+connects to the web interface and have an unknown IP, they will be
+prompted for username and password. Once supplied, the IP is stored
+and the password is removed and not needed anymore the next time.</P>
+<P>This is also a secure option, but requires a bit more hassle from the
+teams, and maybe from the organisers who have to distribute pieces of
+paper.</P>
+<P><EM>Note:</EM> the web interface will only allow a team to
+authenticate themselves once. If an IP is set, a next authentication
+will be refused (to avoid trouble with lingering passwords). In order
+to fully re-authenticate a team, the IP address needs to be unset. You
+might also want to generate a new password for this specific user.
+Furthermore, a team must explicitly connect to the team interface URL,
+because with an unknown IP, the root DOMjudge website will redirect to
+the public interface.</P>
+
+<H3>Using an external LDAP server</H3>
+
+
+<P>This method can be useful when you want to integrate DOMjudge into a
+larger system, or already have credentials on an LDAP server
+available. The <CODE>username</CODE> field in the database must contain
+the LDAP username of the DOMjudge user. Furthermore, in
+<CODE>etc/domserver-config.php</CODE> the <CODE>LDAP_*</CODE> configuration
+settings must be adapted to your setup. Note that multiple (backup)
+servers can be specified: they are queried in order to try to
+successfully authenticate. After successful authentication against the
+LDAP server(s), PHP sessions are used to track login into DOMjudge.</P>
+
+<H3>Fixed authentication</H3>
+
+
+<P>This method automatically authenticates each connection to the
+web interface as a fixed, configurable user. This can be useful for
+testing or demonstration purposes, but probably not for real use
+scenarios.</P>
+
+<H3>Adding new authentication methods</H3>
+
+
+<P>The authentication system is modular and adding new authentication
+methods is fairly easy. The authentication is handled in the file
+<CODE>lib/www/auth.php</CODE>. Adding a new method amounts to editing
+the functions in that file to handle your specific case.</P>
+
+
+<H2><A NAME="contestsetup:testdata"></A> <A NAME="ss4.4">4.4</A> <A HREF="admin-manual.html#toc4.4">Providing testdata </A>
+</H2>
+
+<P>Testdata is used to judge the problems: when a submission run is given the
+input testdata, the resulting output is compared to the reference
+output data using a <EM>compare script</EM>. The default compare
+script simply checks if the outputs are equal up to whitespace
+differences, but more elaborate comparisons can be done, see e.g.
+the <CODE>float</CODE> and <CODE>boolfind_cmp</CODE> scripts.</P>
+<P>The database has a separate table named testcase, which can be manipulated
+from the web interface. Under a problem, click on the testcase link. There
+the files can be uploaded. The judgehosts cache a copy based on MD5 sum, so if
+you need to make changes later, re-upload the data in the web interface and
+it will automatically be picked up.</P>
+<P>Testdata can also be imported into the system from a problem zip file,
+following the 
+<A HREF="http://www.problemarchive.org/wiki/index.php/Problem_Format">Kattis problem package format</A>.</P>
+
+
+<H2><A NAME="ss4.5">4.5</A> <A HREF="admin-manual.html#toc4.5">Start the daemons</A>
+</H2>
+
+
+<P>Once everything is configured, you can start the daemons.
+They all run as a normal user on the system. The needed root privileges
+are gained through sudo only when necessary.</P>
+<P>
+<UL>
+<LI> One or more judgedaemons: one on each judgehost (or optionally
+multiple per host; then the <CODE>-n X</CODE> option should be used to
+bind a judgedaemon to CPU X to prevent CPU resource conflicts).</LI>
+<LI> Optionally the balloon notification daemon (as an alternative
+to the web interface).</LI>
+</UL>
+</P>
+
+<H2><A NAME="ss4.6">4.6</A> <A HREF="admin-manual.html#toc4.6">Check that everything works</A>
+</H2>
+
+
+<P>If the daemons have started without any problems, you've come a long
+way! Now to check that you're ready for a contest.</P>
+<P>First, go to the jury interface:
+<CODE>http(s)://yourhost.example.edu/domjudge/jury</CODE>. Look under all
+the menu items to see whether the displayed data looks sane. Use the
+config-checker under `Admin Functions' for some sanity checks on your
+configuration.</P>
+<P>Go to a team workstation and see if you can access the team page and
+if you can submit solutions.</P>
+<P>Next, it is time to submit some test solutions. If you have the default
+Hello World problem enabled, you can submit some of the example sources
+from under the <CODE>doc/examples</CODE> directory. They should give `CORRECT'.</P>
+<P>You can also try some (or all) of the sources under
+<CODE>tests</CODE>. Use <CODE>make check</CODE> to submit a variety of
+tests; this should work when the submit client is available and the
+default example problems are in the active contest. There's also
+<CODE>make stress-test</CODE>, but be warned that these tests might crash
+a judgedaemon. The results can be checked in the web interface; each
+source file specifies the expected outcome with some explanations. For
+convenience, there is a link <I>judging verifier</I> in the admin
+web interface; this will automatically check whether submitted sources
+from the <CODE>tests</CODE> directory were judged as expected. Note that a
+few sources have multiple possible outcomes: these must be verified
+manually.</P>
+<P>When all this worked, you're quite ready for a contest. Or at least,
+the practice session of a contest.</P>
+
+<H2><A NAME="ss4.7">4.7</A> <A HREF="admin-manual.html#toc4.7">Testing jury solutions</A>
+</H2>
+
+
+<P>Before running a real contest, you and/or the jury will want to test
+the jury's reference solutions on the system.</P>
+<P>The simplest way to do this is to include the jury solutions in a
+problem zip file and upload this. You can also upload a zip file
+containing just solutions to an existing problem. Note that the zip
+archive has to adhere to the 
+<A HREF="http://www.problemarchive.org/wiki/index.php/Problem_Format">Kattis problem package format</A>.
+For this to work, the jury/admin who uploads the problem has to have
+an associated team to which the solutions will be assigned. The
+solutions will automatically be judged if the contest is active (but
+it need not have started yet). You can verify whether the submissions
+gave the expected answer from the link on the jury/admin index page.</P>
+
+
+<HR>
+<A HREF="admin-manual-5.html">Next</A>
+<A HREF="admin-manual-3.html">Previous</A>
+<A HREF="admin-manual.html#toc4">Contents</A>
+</BODY>
+</HTML>

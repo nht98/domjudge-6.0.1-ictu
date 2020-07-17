@@ -1,0 +1,228 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<LINK REL="stylesheet" HREF="../../../style.css">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.73">
+ <TITLE>DOMjudge Administrator's Manual: Common problems and their solutions </TITLE>
+ <LINK HREF="admin-manual-9.html" REL=next>
+ <LINK HREF="admin-manual-7.html" REL=previous>
+ <LINK HREF="admin-manual.html#toc8" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="admin-manual-9.html">Next</A>
+<A HREF="admin-manual-7.html">Previous</A>
+<A HREF="admin-manual.html#toc8">Contents</A>
+<HR>
+<H2><A NAME="problems"></A> <A NAME="s8">8.</A> <A HREF="admin-manual.html#toc8">Common problems and their solutions </A></H2>
+
+
+
+
+<H2><A NAME="ss8.1">8.1</A> <A HREF="admin-manual.html#toc8.1">Java compilers</A>
+</H2>
+
+<P>Java is difficult to deal with in an automatic way. It is probably
+most preferable to use OpenJDK or Oracle Java, because that's the
+version contestants will be used to. The GNU Compiler for Java (GCJ) is
+easier to deal with but may lack some features.</P>
+<P>The recommended way of using Java is by setting up the chroot (see
+section 
+<A HREF="admin-manual-3.html#install_config:judgehost:chroot">creating a chroot environment</A>), but you can also choose one of
+the alternatives as described below.</P>
+<P>
+<OL>
+<LI> As an alternative the <CODE>gcj</CODE> compiler from GNU can be
+used instead of Oracle's version. This one generates true machine
+code and can link statically. However a few function calls
+cannot be linked statically (see `GCJ compiler warnings' in
+this FAQ). Secondly, the static library <CODE>libgcj.a</CODE>
+doesn't seem to be included in all GNU/Linux distributions: at
+least not in RedHat Enterprise Linux 4.</LI>
+<LI> One can disable the chroot environment in
+<CODE>etc/judgehost-config.php</CODE> by disabling <CODE>USE_CHROOT</CODE>.
+Disabling the chroot environment removes this layer of
+security against submissions that attempt to
+cheat, but it is a simple solution to getting Java to work, for
+demo or testing purposes. <B>Note</B>: no guarantees about system
+security can be made when running a contest with chroot disabled!</LI>
+</OL>
+</P>
+
+<H2><A NAME="ss8.2">8.2</A> <A HREF="admin-manual.html#toc8.2">The Java virtual machine (jvm) and memory limits</A>
+</H2>
+
+
+<P>DOMjudge imposes memory limits on submitted solutions. These limits
+are imposed before the compiled submissions are started. On the other
+hand, the Java virtual machine is started via a compile-time generated
+script which is run as a wrapper around the program. This means that
+the memory limits imposed by DOMjudge are for the jvm and the running
+program within it. As the jvm uses approximately 300MB, this reduces
+the limit by this significant amount. See the <CODE>java_javac</CODE> and
+<CODE>java_javac_detect</CODE> compile executable scripts for the
+implementation details.</P>
+<P>If you see error messages of the form
+<HR>
+<PRE>
+Error occurred during initialization of VM
+java.lang.OutOfMemoryError: unable to create new native thread
+</PRE>
+<HR>
+
+or
+<HR>
+<PRE>
+Error occurred during initialization of VM
+Could not reserve enough space for object heap
+</PRE>
+<HR>
+
+Then the problem is probably that the jvm needs more memory than what is
+reserved by the Java compile script. You should try to increase the
+<CODE>MEMRESERVED</CODE> variable in the java compile executable and check that
+the configuration variable <CODE>memory limit</CODE> is set larger than
+<CODE>MEMRESERVED</CODE>. If that does not help, you should try to increase the
+configuration variable <CODE>process limit</CODE> (since the JVM uses a lot of
+processes for garbage collection).</P>
+<P>Note that (especially on x86_64 machines) the jvm seems to preallocate
+huge amounts of memory, up to 2 GB! This is not actually all used, but
+the memory restriction in DOMjudge will flag it as such, unless Linux
+cgroups are enabled, then the actual memory used is measured. Thus, we
+strongly recommend using Linux cgroups when using the Oracle jvm.</P>
+
+<H2><A NAME="ss8.3">8.3</A> <A HREF="admin-manual.html#toc8.3">Java class naming</A>
+</H2>
+
+
+<P>Java requires a specific naming of the main class. When declaring the
+main class <CODE>public</CODE>, the filename must match the class name.
+Therefore one should <EM>not</EM> declare the main class public; from
+experience however, many teams do so. Secondly, the Java compiler
+generates a bytecode file depending on the class name. There are two
+ways to handle this.</P>
+<P>The simplest Java compile script <CODE>java_javac</CODE>
+requires the main class to be named <CODE>Main</CODE> with method
+<HR>
+<PRE>
+public static void main(String args[])
+</PRE>
+<HR>
+</P>
+<P>The alternative (and default) is to use the script
+<CODE>java_javac_detect</CODE>, which automatically detects the
+main class and even corrects the source filename when it is declared
+public.</P>
+<P>When using the GNU gcj compiler, the same holds for the
+<CODE>java_gcj</CODE> script as for <CODE>java_javac</CODE>.</P>
+
+<H2><A NAME="ss8.4">8.4</A> <A HREF="admin-manual.html#toc8.4">GCJ compiler warnings</A>
+</H2>
+
+
+<P>When using the GNU GCJ compiler script <CODE>java_gcj</CODE> for compiling
+Java sources, it can give a whole lot of warning messages of the form
+<PRE>
+/usr/lib/gcc-lib/i386-linux/3.2.3/libgcj.a(gc_dlopen.o)(.text+0xbc):
+In function `GC_dlopen': Using 'dlopen' in statically linked
+applications requires at runtime the shared libraries from the glibc
+version used for linking
+</PRE>
+</P>
+<P>These are generated because you are trying to compile statically
+linked sources, but some functions can not be static, e.g. the
+`dlopen' function above. These are <EM>warnings</EM> and can be safely
+ignored, because under normal programming contest conditions people
+are not allowed to use these functions anyway (and they are not
+accessible within the chroot-ed environment the program is run in).</P>
+
+<H2><A NAME="problems:memory"></A> <A NAME="ss8.5">8.5</A> <A HREF="admin-manual.html#toc8.5">Memory limit errors in the web interface</A>
+</H2>
+
+
+<P>When uploading large testdata files, one can run into an error in
+the jury web interface of the form:
+<PRE>
+Fatal error: Allowed memory size of XX bytes exhausted (tried to
+allocate YY bytes) in /home/domjudge/system/lib/lib.database.php
+on line 154
+</PRE>
+
+This means that the PHP engine has run out of memory. The solution is
+to raise the memory limits for PHP. This can be done by either editing
+<CODE>etc/apache.conf</CODE> and raising the <CODE>memory_limit</CODE>,
+<CODE>upload_max_filesize</CODE> and <CODE>post_max_size</CODE> values to well
+above the size of your largest testcase. You can change these parameters
+under the jury directory or by directly editing the global Apache or
+<CODE>php.ini</CODE> configuration. Note also that <CODE>max_file_uploads</CODE>
+must be larger than the maximum number of testcases per problem to be
+able to upload and edit these in the web interface.</P>
+<P>The optional PHP Suhosin module may also impose additional limits; check
+your error logging to see if these are triggered. You may also need to
+raise MySQL's <CODE>max_allowed_packet</CODE> parameter in
+<CODE>/etc/mysql/my.cnf</CODE> on both server and client.</P>
+
+<H2><A NAME="runguard-rootprivs"></A> <A NAME="ss8.6">8.6</A> <A HREF="admin-manual.html#toc8.6">Compiler errors: `runguard: root privileges not dropped' </A>
+</H2>
+
+
+<P>
+<PRE>
+Compiling failed with exitcode 255, compiler output:
+/home/domjudge/system/bin/runguard: root privileges not dropped
+</PRE>
+
+When the above error occurs on submitting any source, this indicates
+that you are running the <CODE>judgedaemon</CODE> as root user. You should
+not run any part of DOMjudge as root; the parts that require it will
+gain root by themselves through sudo. Either run it as yourself or,
+probably better, create dedicated a user <CODE>domjudge</CODE> under
+which to install and run everything.</P>
+<P>Also do not confuse this with the <CODE>domjudge-run</CODE> user:
+this is a special user to run submissions as and should also not
+be used to run normal DOMjudge processes; this user is only for
+internal use.</P>
+
+<H2><A NAME="problems:apport"></A> <A NAME="ss8.7">8.7</A> <A HREF="admin-manual.html#toc8.7">found processes still running ... apport</A>
+</H2>
+
+
+<P>
+<PRE>
+error: found processes still running as 'domjudge-run', check manually:
+2342 apport
+</PRE>
+
+The above error occurs on submitting segmentation fault solutions if you have
+apport installed (which is default on Ubuntu).
+Disable or uninstall the apport daemon on all judgehosts.</P>
+
+<H2><A NAME="problems:timelimits"></A> <A NAME="ss8.8">8.8</A> <A HREF="admin-manual.html#toc8.8">Enforcement of time limits</A>
+</H2>
+
+
+<P>Time limits within DOMjudge are enforced primarily in CPU time, and
+secondly a more lax wall clock time limit is used to make sure that
+submissions cannot idle and hog judgedaemons. The way that time limits
+are calculated and passed through the system involves a number of
+steps, so documented here.</P>
+<P>Time limits are set per problem in seconds. Each language in turn may
+define a time factor (defaulting to 1) that multiplies it to get a
+specific time limit for that problem/language combination. This is
+the <EM>soft timelimit</EM>. The configuration setting <CODE>timelimit
+overshoot</CODE> is then used to calculate a <EM>hard timelimit</EM>.
+This overshoot can be specified in terms of an absolute and relative
+margin.</P>
+<P>The <CODE>soft:hard</CODE> timelimit pair is passed
+to <CODE>testcase_run.sh</CODE> and then on to <CODE>runguard</CODE> as both
+wall clock and CPU limit. Since the CPU option is passed second, this
+one is used by <CODE>runguard</CODE> when reporting whether the soft,
+actual timelimit has been surpassed. The submitted program gets
+killed when either the hard wall clock or CPU time has passed.</P>
+
+
+<HR>
+<A HREF="admin-manual-9.html">Next</A>
+<A HREF="admin-manual-7.html">Previous</A>
+<A HREF="admin-manual.html#toc8">Contents</A>
+</BODY>
+</HTML>

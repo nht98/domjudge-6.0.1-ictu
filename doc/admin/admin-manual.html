@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<LINK REL="stylesheet" HREF="../../../style.css">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.73">
+ <TITLE>DOMjudge Administrator's Manual</TITLE>
+ <LINK HREF="admin-manual-1.html" REL=next>
+
+
+</HEAD>
+<BODY>
+<A HREF="admin-manual-1.html">Next</A>
+Previous
+Contents
+<HR>
+<H1>DOMjudge Administrator's Manual</H1>
+
+<H2>by the DOMjudge team</H2>Sun, 23 Sep 2018 19:06:40 +0200
+<HR>
+<EM>This document provides information about DOMjudge installation,
+configuration and operation for the DOMjudge administrator. A separate
+manual is available for teams and for jury members.
+Document version: 5922d9b</EM>
+<HR>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="admin-manual-1.html">DOMjudge overview </A></H2>
+
+<UL>
+<LI><A NAME="toc1.1">1.1</A> <A HREF="admin-manual-1.html#ss1.1">Features</A>
+<LI><A NAME="toc1.2">1.2</A> <A HREF="admin-manual-1.html#ss1.2">Requirements</A>
+<LI><A NAME="toc1.3">1.3</A> <A HREF="admin-manual-1.html#ss1.3">Copyright and licencing</A>
+<LI><A NAME="toc1.4">1.4</A> <A HREF="admin-manual-1.html#ss1.4">Contact</A>
+</UL>
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="admin-manual-2.html">Contest planning</A></H2>
+
+<UL>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="admin-manual-2.html#ss2.1">Contest hardware</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="admin-manual-2.html#ss2.2">Requirements </A>
+</UL>
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="admin-manual-3.html">Installation and configuration </A></H2>
+
+<UL>
+<LI><A NAME="toc3.1">3.1</A> <A HREF="admin-manual-3.html#ss3.1">Quick installation</A>
+<LI><A NAME="toc3.2">3.2</A> <A HREF="admin-manual-3.html#ss3.2">Prerequisites</A>
+<LI><A NAME="toc3.3">3.3</A> <A HREF="admin-manual-3.html#ss3.3">Installation system </A>
+<LI><A NAME="toc3.4">3.4</A> <A HREF="admin-manual-3.html#ss3.4">Database installation</A>
+<LI><A NAME="toc3.5">3.5</A> <A HREF="admin-manual-3.html#ss3.5">Web server configuration</A>
+<LI><A NAME="toc3.6">3.6</A> <A HREF="admin-manual-3.html#ss3.6">Fine tuning server settings</A>
+<LI><A NAME="toc3.7">3.7</A> <A HREF="admin-manual-3.html#ss3.7">Installation of a judgehost</A>
+<LI><A NAME="toc3.8">3.8</A> <A HREF="admin-manual-3.html#ss3.8">Building and installing the submit client</A>
+<LI><A NAME="toc3.9">3.9</A> <A HREF="admin-manual-3.html#ss3.9">Configuration</A>
+<LI><A NAME="toc3.10">3.10</A> <A HREF="admin-manual-3.html#ss3.10">OpenID Connect</A>
+<LI><A NAME="toc3.11">3.11</A> <A HREF="admin-manual-3.html#ss3.11">Executables</A>
+<LI><A NAME="toc3.12">3.12</A> <A HREF="admin-manual-3.html#ss3.12">Configuration of languages</A>
+<LI><A NAME="toc3.13">3.13</A> <A HREF="admin-manual-3.html#ss3.13">Configuration of special run and compare programs</A>
+<LI><A NAME="toc3.14">3.14</A> <A HREF="admin-manual-3.html#ss3.14">Alerting system</A>
+<LI><A NAME="toc3.15">3.15</A> <A HREF="admin-manual-3.html#ss3.15">Other configurable scripts</A>
+<LI><A NAME="toc3.16">3.16</A> <A HREF="admin-manual-3.html#ss3.16">Logging &amp; debugging</A>
+<LI><A NAME="toc3.17">3.17</A> <A HREF="admin-manual-3.html#ss3.17">(Re)generating documentation and the team manual</A>
+<LI><A NAME="toc3.18">3.18</A> <A HREF="admin-manual-3.html#ss3.18">Optional features </A>
+<LI><A NAME="toc3.19">3.19</A> <A HREF="admin-manual-3.html#ss3.19">Upgrading</A>
+</UL>
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="admin-manual-4.html">Setting up a contest </A></H2>
+
+<UL>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="admin-manual-4.html#ss4.1">Configure the contest data </A>
+<LI><A NAME="toc4.2">4.2</A> <A HREF="admin-manual-4.html#ss4.2">Contest milestones</A>
+<LI><A NAME="toc4.3">4.3</A> <A HREF="admin-manual-4.html#ss4.3">User authentication </A>
+<LI><A NAME="toc4.4">4.4</A> <A HREF="admin-manual-4.html#ss4.4">Providing testdata </A>
+<LI><A NAME="toc4.5">4.5</A> <A HREF="admin-manual-4.html#ss4.5">Start the daemons</A>
+<LI><A NAME="toc4.6">4.6</A> <A HREF="admin-manual-4.html#ss4.6">Check that everything works</A>
+<LI><A NAME="toc4.7">4.7</A> <A HREF="admin-manual-4.html#ss4.7">Testing jury solutions</A>
+</UL>
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="admin-manual-5.html">Team Workstations</A></H2>
+
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="admin-manual-6.html">Web interface</A></H2>
+
+<UL>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="admin-manual-6.html#ss6.1">Jury and Administrator view</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="admin-manual-6.html#ss6.2">The scoreboard </A>
+<LI><A NAME="toc6.3">6.3</A> <A HREF="admin-manual-6.html#ss6.3">Balloons</A>
+</UL>
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="admin-manual-7.html">Security </A></H2>
+
+<UL>
+<LI><A NAME="toc7.1">7.1</A> <A HREF="admin-manual-7.html#ss7.1">Considerations</A>
+<LI><A NAME="toc7.2">7.2</A> <A HREF="admin-manual-7.html#ss7.2">Internal security </A>
+<LI><A NAME="toc7.3">7.3</A> <A HREF="admin-manual-7.html#ss7.3">Root privileges </A>
+<LI><A NAME="toc7.4">7.4</A> <A HREF="admin-manual-7.html#ss7.4">File system privileges </A>
+<LI><A NAME="toc7.5">7.5</A> <A HREF="admin-manual-7.html#ss7.5">External security </A>
+</UL>
+<H2>Appendix</H2>
+<P>
+<H2><A NAME="toc8">8.</A> <A HREF="admin-manual-8.html">Common problems and their solutions </A></H2>
+
+<UL>
+<LI><A NAME="toc8.1">8.1</A> <A HREF="admin-manual-8.html#ss8.1">Java compilers</A>
+<LI><A NAME="toc8.2">8.2</A> <A HREF="admin-manual-8.html#ss8.2">The Java virtual machine (jvm) and memory limits</A>
+<LI><A NAME="toc8.3">8.3</A> <A HREF="admin-manual-8.html#ss8.3">Java class naming</A>
+<LI><A NAME="toc8.4">8.4</A> <A HREF="admin-manual-8.html#ss8.4">GCJ compiler warnings</A>
+<LI><A NAME="toc8.5">8.5</A> <A HREF="admin-manual-8.html#ss8.5">Memory limit errors in the web interface</A>
+<LI><A NAME="toc8.6">8.6</A> <A HREF="admin-manual-8.html#ss8.6">Compiler errors: `runguard: root privileges not dropped' </A>
+<LI><A NAME="toc8.7">8.7</A> <A HREF="admin-manual-8.html#ss8.7">found processes still running ... apport</A>
+<LI><A NAME="toc8.8">8.8</A> <A HREF="admin-manual-8.html#ss8.8">Enforcement of time limits</A>
+</UL>
+<P>
+<H2><A NAME="toc9">9.</A> <A HREF="admin-manual-9.html">Multi-site contests </A></H2>
+
+<P>
+<H2><A NAME="toc10">10.</A> <A HREF="admin-manual-10.html">Developer information </A></H2>
+
+<UL>
+<LI><A NAME="toc10.1">10.1</A> <A HREF="admin-manual-10.html#ss10.1">Bootstrapping from Git repository sources</A>
+<LI><A NAME="toc10.2">10.2</A> <A HREF="admin-manual-10.html#ss10.2">Maintainer mode installation</A>
+<LI><A NAME="toc10.3">10.3</A> <A HREF="admin-manual-10.html#ss10.3">Makefile structure</A>
+</UL>
+<HR>
+<A HREF="admin-manual-1.html">Next</A>
+Previous
+Contents
+</BODY>
+</HTML>

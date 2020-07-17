@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<LINK REL="stylesheet" HREF="../../../style.css">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.73">
+ <TITLE>DOMjudge Administrator's Manual: DOMjudge overview </TITLE>
+ <LINK HREF="admin-manual-2.html" REL=next>
+
+ <LINK HREF="admin-manual.html#toc1" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="admin-manual-2.html">Next</A>
+Previous
+<A HREF="admin-manual.html#toc1">Contents</A>
+<HR>
+<H2><A NAME="overview"></A> <A NAME="s1">1.</A> <A HREF="admin-manual.html#toc1">DOMjudge overview </A></H2>
+
+
+<P>DOMjudge is a system for running programming contests, like the ACM
+ICPC regional and world championship programming contests.</P>
+<P>This means that teams are on-site and have a fixed time period (mostly
+5 hours) and one computer to solve a number of problems (mostly 8-11).
+Problems are solved by writing a program in one of the allowed
+languages, that reads input according to the problem input
+specification and writes the correct, corresponding output.</P>
+<P>The judging is done by submitting the source code of the solution to
+the jury. There the jury system automatically compiles and runs the
+program and compares the program output with the expected output.</P>
+<P>This software can be used to handle the submission and judging during
+such contests. It also handles feedback to the teams and communication
+on problems (clarification requests). It has web interfaces for the
+jury, the teams (their submissions and clarification requests) and the
+public (scoreboard).</P>
+
+<H2><A NAME="ss1.1">1.1</A> <A HREF="admin-manual.html#toc1.1">Features</A>
+</H2>
+
+
+<P>A global overview of the features that DOMjudge provides:
+<UL>
+<LI>Automatic judging with distributed (scalable) judge hosts</LI>
+<LI>Web interface for portability and simplicity</LI>
+<LI>Modular system for plugging in languages/compilers and validators</LI>
+<LI>Detailed jury information (submissions, judgings, diffs) and
+options (rejudge, clarifications, resubmit)</LI>
+<LI>Designed with security in mind</LI>
+</UL>
+</P>
+<P>DOMjudge has been used in many live contests
+(see 
+<A HREF="https://www.domjudge.org/intro">https://www.domjudge.org/intro</A> for an overview) and
+is Open Source, Free Software.</P>
+
+<H2><A NAME="ss1.2">1.2</A> <A HREF="admin-manual.html#toc1.2">Requirements</A>
+</H2>
+
+
+<P>This is a (rough) list of the requirements for DOMjudge.</P>
+<P>
+<UL>
+<LI>At least one machine running Linux, with (sudo) root access</LI>
+<LI>Apache web server with PHP 5.3.3 or newer and PHP-command line interface</LI>
+<LI>MySQL or MariaDB database server version 5.3.3 or newer</LI>
+<LI>Compilers for the languages you want to support</LI>
+</UL>
+</P>
+<P>A 
+<A HREF="admin-manual-2.html#install_config:requirements">detailed list of requirements</A>
+is contained in the 
+<A HREF="admin-manual-3.html#install_config">Installation and Configuration</A>
+chapter.</P>
+
+<H2><A NAME="ss1.3">1.3</A> <A HREF="admin-manual.html#toc1.3">Copyright and licencing</A>
+</H2>
+
+
+<P>DOMjudge is developed by Jaap Eldering, Nicky Gerritsen, Keith
+Johnson, Thijs Kinkhorst and Tobias Werth; Peter van de Werken has
+retired as developer. Many other people have contributed (apologies
+for any oversights):
+Michael Baer,
+Jeroen Bransen,
+Stijn van Drongelen,
+Rob Franken,
+Marc Furon,
+Jacob Kleerekoper,
+Ruud Koot,
+Jan Kuipers,
+Richard Lobb,
+Alex Muntada,
+Dominik Paulus,
+Bert Peters,
+Jeroen Schot,
+Matt Steele,
+Shuhei Takahashi,
+Hoai-Thu Vuong,
+and Jeroen van Wolffelaar.
+Some code has been ported from the ETH Zurich fork by Christoph
+Krautz, Thomas Rast et al.</P>
+<P>DOMjudge is Copyright (c) 2004 - 2018 by the DOMjudge developers and its contributors.</P>
+<P>DOMjudge, including its documentation, is free software; you can redistribute
+it and/or modify it under the terms of the 
+<A HREF="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</A> as published by the Free Software
+Foundation; either version 2, or (at your option) any later version. See the
+file COPYING.</P>
+<P>This software is partly based on code by other people. These
+acknowledgements are made in the respective files, but we would like
+to name them here too (with non-GPL licences listed where applicable):
+<UL>
+<LI> dash (i386) is included, statically compiled from the Debian
+dash sources (copyright by various people under the BSD licence
+and a part under the GNU GPL version 2. See <CODE>COPYING.BSD</CODE>
+<CODE>doc/dash.copyright</CODE> for more details).
+Sources can be downloaded from: 
+<A HREF="https://www.domjudge.org/sources/">https://www.domjudge.org/sources/</A>.</LI>
+<LI> basename.h is a modified version from the
+GNU libiberty library (copyright Free Software Foundation).</LI>
+<LI> lib.database.php by Jeroen van Wolffelaar et al.</LI>
+<LI> runguard.c was originally based on timeout from The
+Coroner's Toolkit by Wietse Venema.</LI>
+<LI> sorttable.js, by Stuart Langridge, licenced under
+the MIT licence, see <CODE>COPYING.MIT</CODE>.
+It was downloaded from 
+<A HREF="http://www.kryogenix.org/code/browser/sorttable/">http://www.kryogenix.org/code/browser/sorttable/</A>.</LI>
+<LI> jscolor.js by Jan Odvarko, licenced under the GNU LGPL. It
+was obtained at 
+<A HREF="http://jscolor.com">http://jscolor.com</A>.</LI>
+<LI> tabber.js by Patrick Fitzgerald, licenced under the MIT
+licence, see <CODE>COPYING.MIT</CODE>. It was downloaded from
+<A HREF="http://www.barelyfitz.com/projects/tabber/">http://www.barelyfitz.com/projects/tabber/</A>.</LI>
+<LI> Ace code editor by Ajax.org B.V., licenced under the BSD
+licence, see <CODE>COPYING.BSD</CODE>. It was downloaded from
+<A HREF="https://github.com/ajaxorg/ace-builds">https://github.com/ajaxorg/ace-builds</A>,
+the <CODE>src-min-noconflict</CODE> version.</LI>
+<LI> jQuery JavaScript library by the jQuery Foundation, licenced
+under the MIT licence, see <CODE>COPYING.MIT</CODE>. It was
+downloaded from 
+<A HREF="http://jquery.com/">http://jquery.com/</A>.</LI>
+<LI> jQuery TokenInput by James Smith, dual
+licenced under the GPL and MIT licences, see <CODE>COPYING</CODE>
+and <CODE>COPYING.MIT</CODE>. It was downloaded from
+<A HREF="https://github.com/loopj/jquery-tokeninput">https://github.com/loopj/jquery-tokeninput</A>.</LI>
+<LI> JavaScript Cookie by Klaus Hartl and Fagner Brack, licenced
+under the MIT licence, see <CODE>COPYING.MIT</CODE>. It was
+downloaded from 
+<A HREF="https://github.com/js-cookie/js-cookie">https://github.com/js-cookie/js-cookie</A>.</LI>
+<LI> The Spyc PHP YAML parser by Chris Wanstrath and Vlad Andersen,
+licenced under the MIT licence, see <CODE>COPYING.MIT</CODE>. It
+was downloaded from 
+<A HREF="https://github.com/mustangostang/spyc/">https://github.com/mustangostang/spyc/</A>.</LI>
+<LI> The default compare script was included from the
+Kattis problemtools package, and licenced under the MIT
+licence, see <CODE>COPYING.MIT</CODE>. It was downloaded from
+<A HREF="https://github.com/Kattis/problemtools/tree/master/support/default_validator">https://github.com/Kattis/problemtools/tree/master/support/default_validator</A>.</LI>
+<LI> The DOMjudge logo is based on the NKP 2004 logo made by
+Erik van Sebille.</LI>
+<LI> Several icons have been taken from the phpMyAdmin project.</LI>
+<LI> Several M4 autoconf macros from the 
+<A HREF="http://www.gnu.org/software/autoconf-archive/">Autoconf archive</A> by various
+people are included under <CODE>m4/</CODE>. These are licenced
+under all-permissive and GPL3+ licences; see the respective
+files for details.</LI>
+</UL>
+</P>
+
+
+<H3>About the name and logo</H3>
+
+
+<P>The name of this judging system is inspired by a very important and
+well known landmark in the city of Utrecht: the dome tower, called the
+`Dom' in Dutch. The logo of the 2004 Dutch Programming
+Championships (for which this system was originally developed) depicts
+a representation of the Dom in zeros and ones. We based the name and
+logo of DOMjudge on that.</P>
+<P>We would like to thank Erik van Sebille, the original creator of the
+logo. The logo is under a GPL licence, although Erik first suggested a
+"free as in beer" licence first: you're allowed to use it, but you owe
+Erik a free beer in case might you encounter him.</P>
+
+<H2><A NAME="ss1.4">1.4</A> <A HREF="admin-manual.html#toc1.4">Contact</A>
+</H2>
+
+<P>The DOMjudge homepage can be found at:
+<A HREF="https://www.domjudge.org/">https://www.domjudge.org/</A></P>
+<P>We have a low volume 
+<A HREF="https://www.domjudge.org/mailman/listinfo/domjudge-announce">mailing list for announcements</A>
+of new releases.</P>
+<P>The authors can be reached through the development mailing list:
+<A HREF="mailto:domjudge-devel@domjudge.org">domjudge-devel@domjudge.org</A>. You need
+to be subscribed before you can post. See
+<A HREF="https://www.domjudge.org/mailman/listinfo/domjudge-devel">the list information page</A>
+for subscription and more details.</P>
+<P>Some developers and users of DOMjudge linger on the IRC channel
+dedicated to DOMjudge on the Freenode network:
+server <CODE>irc.freenode.net</CODE>, channel <CODE>#domjudge</CODE>.
+Feel free to drop by with your questions and comments, but note that
+it may sometimes take a bit longer than a few minutes to get a
+response.
+</P>
+
+<HR>
+<A HREF="admin-manual-2.html">Next</A>
+Previous
+<A HREF="admin-manual.html#toc1">Contents</A>
+</BODY>
+</HTML>

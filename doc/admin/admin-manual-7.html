@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<LINK REL="stylesheet" HREF="../../../style.css">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.73">
+ <TITLE>DOMjudge Administrator's Manual: Security </TITLE>
+ <LINK HREF="admin-manual-8.html" REL=next>
+ <LINK HREF="admin-manual-6.html" REL=previous>
+ <LINK HREF="admin-manual.html#toc7" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="admin-manual-8.html">Next</A>
+<A HREF="admin-manual-6.html">Previous</A>
+<A HREF="admin-manual.html#toc7">Contents</A>
+<HR>
+<H2><A NAME="security"></A> <A NAME="s7">7.</A> <A HREF="admin-manual.html#toc7">Security </A></H2>
+
+
+<P>This judging system was developed with security as one of the main
+goals in mind. To implement this rigorously in various aspects
+(restricting team access to others and the internet, restricting
+access to the submitted programs on the domjudge systems, etc...)
+requires root privileges to different parts of the whole contest
+environment. Also, security measures might depend on the environment.
+Therefore we have decided not to implement security measures which are
+not directly related to the judging system itself. We do have some
+suggestions on how you can setup external security.</P>
+
+<H2><A NAME="ss7.1">7.1</A> <A HREF="admin-manual.html#toc7.1">Considerations</A>
+</H2>
+
+
+<P>Security considerations for a programming contest are a bit different
+from those in normal conditions: normally users only have to be
+protected from deliberately harming each other. During a contest we
+also have to restrict users from cooperatively communicating,
+accessing restricted resources (like the internet) and restrict user
+programs running on judgehosts.</P>
+<P>We expect that chances are small that people are trying to cheat
+during a programming contest: you have to hack the system and make use
+of that within very limited time. And you have to not get caught and
+disqualified afterwards. Therefore passive security measures of
+warning people of the consequences and only check (or probe) things
+might be enough.</P>
+<P>However we wanted the system to be as secure as possible within
+reason. Furthermore this software is open source, so users can try to
+find weak spots before the contest.</P>
+
+<H2><A NAME="security:internal"></A> <A NAME="ss7.2">7.2</A> <A HREF="admin-manual.html#toc7.2">Internal security </A>
+</H2>
+
+
+<P>Internal security of the system relies on users not being able to get
+to any vital data (jury input/output and users' solutions). Data is
+stored in two places: in files on the DOMjudge system account and in
+the SQL database.</P>
+<P>Files should be protected by restricting permission to the relevant
+directories.</P>
+<P><EM>Note:</EM> the database password is stored in
+<CODE>etc/dbpasswords.secret</CODE>. This file has to be
+non-readable to teams, but has to be readable to the web server to let
+the jury web interface work. A solution is to make it readable to a
+special group the web server runs as. This is done when using the
+default configuration and installation method and when <CODE>make
+install-{domserver,judgehost}</CODE> is run as root. The webserver group
+can be set with <CODE>configure --with-webserver-group=GROUP</CODE>; by
+default it is tried to be determined from groups available on the
+system, e.g. <CODE>www-data</CODE> or <CODE>apache</CODE>.</P>
+<P>Judgehosts and the domserver communicate with each other over HTTP.
+Also all parties accessing the domserver web interface obviously use
+this protocol. We advise to setup HTTPS so interactions between domserver,
+judgehosts and teams are all protected. If you need to use a self-signed
+certificate, you can consider to install it on the team workstations
+beforehand to minimize hassle.</P>
+<P>When using IP address authentication, one has to be careful that teams
+are not able to spoof their IP (for which they normally need
+root/administrator privileges), as they would then be able to view
+other teams' submission info (not their code) and clarifications and
+submit as that team.
+<EM>Note:</EM> This means that care has to be taken e.g. that teams
+cannot simply login onto one another's computer and spoof their identity.</P>
+<P>Problem texts can be uploaded to DOMjudge. No filtering is performed
+there, so make sure they are from trusted sources to, in the
+case of HTML, prevent cross site scripting code to be injected.</P>
+
+<H2><A NAME="security:rootprivs"></A> <A NAME="ss7.3">7.3</A> <A HREF="admin-manual.html#toc7.3">Root privileges </A>
+</H2>
+
+
+<P>A difficult issue is the securing of submitted programs run by the
+jury. We do not have any control over these sources and do not want to
+rely on checking them manually or filtering on things like system
+calls (which can be obscured and are different per language).</P>
+<P>Therefore we decided to tackle this issue by running these programs in
+a environment as restrictive as possible. This is done by setting up a
+minimal chroot environment with Linux cgroup process control. For
+this, root privileges on the judgehosts and statically compiled
+programs are needed. By also limiting all kinds of system resources
+(memory, processes, time, unprivileged user and network access) we
+protect the system from programs which try to hack or could crash the
+system.</P>
+
+<H2><A NAME="security:fileprivs"></A> <A NAME="ss7.4">7.4</A> <A HREF="admin-manual.html#toc7.4">File system privileges </A>
+</H2>
+
+
+<P>Of course you must make sure that the file system privileges are set
+such that there's no unauthorised access to sensitive data, like
+submitted solutions or passwords. This is quite system dependent. At
+least <CODE>&lt;judgehost_judgedir&gt;</CODE> should not be readable by other users
+than DOMjudge.</P>
+
+<H3><A NAME="security:webprivs"></A> Permissions for the web server </H3>
+
+
+<P>The default installation sets permissions correctly for the web
+server user (commonly <CODE>www-data</CODE> or <CODE>apache</CODE>).
+The following information is for those who want to verify the setup
+or make modifications to the settings.</P>
+<P>Care should be taken with the <CODE>etc</CODE> directory: the
+<CODE>domserver-{config,static}.php</CODE>, <CODE>dbpasswords.secret</CODE>
+and <CODE>restapi.secret</CODE> files should all be readable, but
+<CODE>dbpasswords.secret</CODE> and <CODE>restapi.secret</CODE> should not be
+readable by anyone else. This can be done for example by setting the
+<CODE>etc</CODE> directory to owner:group &lt;DOMjudge
+account&gt;:&lt;Web server group&gt; and permissions
+<CODE>drwxr-x---</CODE>, denying users other than yourself and the
+web server group access to the configuration and password files.</P>
+<P>If you want the web server to also store incoming submission sources on
+the file system (next to the database), then <CODE>&lt;domserver_submitdir&gt;</CODE> must be
+writable for the web server, see also 
+<A HREF="admin-manual-3.html#install_config:storage_submissions">storage of submissions</A>.</P>
+<P>You should take care not to serve any files over the web that
+are not under the DOMjudge 'www/' directory, because they might
+contain sensitive data (e.g. those under <CODE>etc/</CODE>). DOMjudge
+comes with <CODE>.htaccess</CODE> files that try to prevent this, but
+double-check that it's not accessible.</P>
+
+<H2><A NAME="security:external"></A> <A NAME="ss7.5">7.5</A> <A HREF="admin-manual.html#toc7.5">External security </A>
+</H2>
+
+
+<P>The following security issues are <EM>not</EM> handled by DOMjudge,
+but left to the administrator to set up.</P>
+<P>Network traffic between team computers, domserver and the internet
+should be limited to what is allowed. Possible ways of enforcing this
+might be: monitor traffic, modify firewall rules on team computers or
+(what we implemented with great satisfaction) put all team computers
+behind a firewalling router.</P>
+<P>Solutions are run within a restricted (chroot/cgroup) environment on
+the judgehosts which restricts outgoing network access.</P>
+
+<HR>
+<A HREF="admin-manual-8.html">Next</A>
+<A HREF="admin-manual-6.html">Previous</A>
+<A HREF="admin-manual.html#toc7">Contents</A>
+</BODY>
+</HTML>

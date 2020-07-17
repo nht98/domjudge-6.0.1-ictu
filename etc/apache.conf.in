@@ -1,0 +1,90 @@
+# @configure_input@
+
+# Apache configuration for DOMjudge
+
+
+### VirtualHost config ###
+#
+# Use this VirtualHost block if you want DOMjudge to live in
+# the root of your webserver. See the Apache documentation for
+# virtualhosts for more information.
+
+# Using HTTP:
+
+#NameVirtualHost *
+#<VirtualHost *>
+#ServerName _default_
+#DocumentRoot @domserver_webappdir@/web
+#</VirtualHost>
+
+# Alternatively, use HTTPS and redirect HTTP to HTTPS:
+
+#Listen 443
+#
+#<VirtualHost *:80>
+#ServerName _default_
+#Redirect permanent / https://domjudge.example.com/
+#</VirtualHost>
+#
+#<VirtualHost *:443>
+#ServerName _default_
+#DocumentRoot @domserver_webappdir@/web
+#
+#SSLEngine on
+#SSLCertificateFile    /path/to/your/SSL-certificate.crt
+#SSLCertificateKeyFile /path/to/your/SSL-key.key
+#SSLCertificateChainFile /path/to/your/certificate-chain.pem
+#</VirtualHost>
+
+
+### Alias config ###
+#
+# Alternatively, use this instead of the VirtualHost above when you don't
+# want DOMjudge in the root, but only occupy a subdir, like this:
+# www.example.com/domjudge
+Alias /domjudge @domserver_webappdir@/web
+
+### General options ###
+#
+# This section applies to both options above.
+
+<Directory @domserver_webappdir@/web>
+Require all granted
+
+Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ app.php [QSA,L]
+# Uncomment to run symfony in debug mode
+#RewriteRule ^(.*)$ app_dev.php [QSA,L]
+
+RewriteRule .svn/ - [F]
+RewriteRule .git/ - [F]
+RewriteRule .gitignore$ - [F]
+RewriteRule Makefile$ - [F]
+
+# If you want to allow large file uploads for testcases, you must
+# ensure that the following PHP settings are all set to high enough
+# values. The following example will allow to upload testcases of
+# up to 64 MB. Defaults for these vary per PHP version and install.
+# Note that additionally, you may want to increase max_file_uploads
+# in your php.ini file to allow for more testcases per problem and
+# multiple file submissions.
+
+#<IfModule mod_php7.c>
+#php_value max_file_uploads    100
+#php_value upload_max_filesize 128M
+#php_value post_max_size       128M
+#php_value memory_limit        512M
+#</IfModule>
+
+</Directory>
+
+<Directory @domserver_webappdir@/web/bundles>
+    RewriteEngine Off
+</Directory>
+
+# vim: syntax=apachestyle
+# Local Variables:
+# mode: apache
+# end:

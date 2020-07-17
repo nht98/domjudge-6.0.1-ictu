@@ -1,0 +1,35 @@
+# Generated from 'app/config/parameters.yml.dist' on Scorpion, Thứ năm, 15 Tháng 11 năm 2018 13:31:42 +07.
+
+# Generated from 'app/config/parameters.yml.dist.in' on Thứ năm, 15 Tháng 11 năm 2018 13:31:42 +07.
+
+# This file is a "template" of what your parameters.yml file should look like.
+
+# Note that during DOMjudge installation parameters.yml will be
+# regenerated from parameters.yml.dist with the correct database
+# credentials and a random secret token inserted. In turn
+# parameters.yml.dist is generated from parameters.yml.dist.in at
+# configure time to add e.g. the DOMjudge version.
+
+# Set parameters here that may be different on each deployment target of the
+# app, e.g. development, staging, production.
+# http://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
+
+
+parameters:
+    database_host: localhost
+    database_port: ~
+    database_name: domjudge
+    database_user: domjudge
+    database_password: bYxA44AjhlAxolfU
+
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: ~
+    mailer_password: ~
+
+    # A secret key that's used to generate certain security-related tokens
+    secret: KdswP352TUFBMxOwtY9p
+
+    # The parameters below are inserted at configure time.
+    domjudge.version: 6.0.1
+    domjudge.tmpdir: /opt/domjudge/domserver/tmp
